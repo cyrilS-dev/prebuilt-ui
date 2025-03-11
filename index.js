@@ -52,7 +52,7 @@ async function createCallframe() {
 
 async function createRoom() {
   try {
-    const response = await fetch('http://35.181.79.120:8000/create-room'); // Adjust URL if backend is hosted elsewhere
+    const response = await fetch('/api/create-room'); // Adjust URL if backend is hosted elsewhere
     const data = await response.json();
     return { url: data.url };
   } catch (e) {
