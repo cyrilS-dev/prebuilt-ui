@@ -5,19 +5,10 @@
  */
 
 /* Main functions */
-let callFrame = null; // Initialize as null to check existence
-let room, networkUpdateID;
+let callFrame, room, networkUpdateID;
 
 async function createCallframe() {
   const callWrapper = document.getElementById('wrapper');
-
-  // Check if callFrame already exists
-  if (callFrame) {
-    console.log('Reusing existing callFrame instance');
-    return; // Exit if it already exists
-  }
-
-  // Create a new callFrame only if it doesn’t exist
   callFrame = window.DailyIframe.createFrame(callWrapper);
 
   callFrame
@@ -51,14 +42,8 @@ async function createCallframe() {
 }
 
 async function createRoom() {
-  try {
-    const response = await fetch('http://35.181.79.120:8000/create-room'); // Adjust URL if backend is hosted elsewhere
-    const data = await response.json();
-    return { url: data.url };
-  } catch (e) {
-    console.error('Error fetching room URL:', e);
-    return null;
-  }
+  
+  return { url: 'https://tavus.daily.co/ca6ded841a1c' };
 }
 
 async function createRoomAndStart() {
@@ -73,18 +58,16 @@ async function createRoomAndStart() {
   if (!room) {
     errorTitle.innerHTML = 'Error creating room';
     errorDescription.innerHTML =
-      'Failed to connect to the backend. Please check if the server is running.';
+      "If you're developing locally, please check the README instructions.";
     toggleMainInterface();
     toggleError();
-    createAndStartButton.innerHTML = 'Start';
-    return;
   }
   copyUrl.value = room.url;
 
   showDemoCountdown();
 
   try {
-    await callFrame.join({
+    callFrame.join({
       url: room.url,
       showLeaveButton: true,
     });
@@ -92,7 +75,6 @@ async function createRoomAndStart() {
     toggleError();
     console.error(e);
   }
-  createAndStartButton.innerHTML = 'Start';
 }
 
 async function joinCall() {
@@ -141,7 +123,7 @@ function toggleControls() {
 function toggleCallStyling() {
   const callWrapper = document.getElementById('wrapper');
   const createAndStartButton = document.getElementById('create-and-start');
-  createAndStartButton.innerHTML = 'Start';
+  createAndStartButton.innerHTML = 'Create room and start';
   callWrapper.classList.toggle('in-call');
 }
 
@@ -170,9 +152,6 @@ function handleLeftMeeting() {
     clearInterval(networkUpdateID);
     networkUpdateID = null;
   }
-  // Optionally destroy the callFrame here if you want to allow re-creation
-  // callFrame.destroy();
-  // callFrame = null;
 }
 
 function resetErrorDesc() {
@@ -246,12 +225,16 @@ function toggleParticipantsBar() {
 }
 
 /* Other helper functions */
+
+// Starts an interval to check local network info
+// every 2 seconds.
 function startNetworkInfoPing() {
   networkUpdateID = setInterval(() => {
     updateNetworkInfoDisplay();
   }, 2000);
 }
 
+// Populates 'network info' with information info from daily-js
 async function updateNetworkInfoDisplay() {
   const videoSend = document.getElementById('video-send'),
     videoReceive = document.getElementById('video-receive'),
@@ -308,8 +291,3 @@ function showDemoCountdown() {
     }, 1000);
   }
 }
-
-// Initialize the call frame when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  createCallframe();
-});
